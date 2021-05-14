@@ -1,20 +1,29 @@
 import fitz
 import re
+import glob
 
 class PDFParser():
 
-    def __init__(self, pdf_document):
-        self.document = fitz.open(pdf_document)
-        self.no_pages = self.document.pageCount
-        self.doc_text = self.process_document(self.document)
+    def __init__(self, dir):
+        self.docs = [f for f in glob.glob("{}/*.pdf".format(dir))]
 
-    def save_text(self):
-        pass
+    def save_text(self, doc):
+        document = fitz.open(doc)
+        no_pages = document.pageCount
+        doc_text = self.process_document(document, no_pages)
+        file_name = '../txts/' + doc[:-4] + '.txt'
+        with open(file_name, 'w') as f:
+            f.write(doc_text)
+
+    def save_all(self):
+        for doc in self.docs:
+            self.save_text(doc)
 
     def process_text(self, text):
         text = text.strip() # remove trailing spaces
         text = re.sub(r'\n', '', text) # remove new line
         text = re.sub(' +', ' ', text).strip() # remove multiple spaces
+        text = re.sub(r'[^a-zA-Z0-9 ,.;()\'"]', '', text) # remove anything that is not alphanumeric or punctuation
 
         return text
 
@@ -23,16 +32,17 @@ class PDFParser():
         page_text = page.getText("blocks")
         text = [x for _, _, _, _, x, _, _ in page_text]
         text = ''.join(text)
+        text = self.process_text(text)
 
         return text
 
-    def process_document(self, document):
+    def process_document(self, document, no_pages):
         text = ''
-        for i in range(self.no_pages):
+        for i in range(no_pages):
             text += self.process_page(document, i)
 
         return text
 
 if __name__ == "__main__":
-    pdf_parser = PDFParser('../../national-climate-plans/pdfs/AFG_Afghanistan_First_NDC_English.pdf')
-    print(pdf_parser.doc_text)
+    pdf_parser = PDFParser("../../national-climate-plans/pdfs")
+    pdf_parser.save_all()
