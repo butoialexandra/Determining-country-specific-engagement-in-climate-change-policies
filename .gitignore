@@ -1,2 +1,3 @@
 venv/*
 txts/*
+notebooks/.ipynb_checkpoints/*
