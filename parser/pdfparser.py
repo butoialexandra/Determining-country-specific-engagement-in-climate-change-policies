@@ -1,22 +1,28 @@
 import fitz
 import re
 import glob
+from tqdm import tqdm
 
 class PDFParser():
 
     def __init__(self, dir):
-        self.docs = [f for f in glob.glob("{}/*.pdf".format(dir))]
+        self.dir = dir
+        self.docs = [f for f in glob.glob("{}/*.pdf".format(self.dir))]
 
     def save_text(self, doc):
-        document = fitz.open(doc)
-        no_pages = document.pageCount
-        doc_text = self.process_document(document, no_pages)
-        file_name = '../txts/' + doc[:-4] + '.txt'
-        with open(file_name, 'w') as f:
-            f.write(doc_text)
+        try:
+            document = fitz.open(doc)
+            no_pages = document.pageCount
+            doc_text = self.process_document(document, no_pages)
+            file_name = '../txts' + doc[doc.rfind('/'):-4] + '.txt'
+            with open(file_name, 'w') as f:
+                f.write(doc_text)
+        except:
+            print(doc)
+
 
     def save_all(self):
-        for doc in self.docs:
+        for doc in tqdm(self.docs):
             self.save_text(doc)
 
     def process_text(self, text):
