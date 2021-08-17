@@ -3,8 +3,9 @@
 
 ### Course Project for Big Data for Public Policy, ETHZ Spring Semester 2021
 
-Download the NDC pdfs using [this](https://github.com/openclimatedata/national-climate-plans) repository.
+Follow the instructions from the Colab Notebooks to download the PDF files, scrape them and do topic modeling on the scraped data.
 
+Run the following to start the web applicattion:
 ```
 cd app
 python app.py
