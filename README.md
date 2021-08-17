@@ -5,3 +5,7 @@
 
 Download the NDC pdfs using [this](https://github.com/openclimatedata/national-climate-plans) repository.
 
+```
+cd app
+python app.py
+```
