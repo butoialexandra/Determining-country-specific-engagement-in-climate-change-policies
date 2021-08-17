@@ -73,7 +73,7 @@ app.layout = html.Div(
                                 dcc.Dropdown(
                                     id="topic_dropdown",
                                     options = [
-                                        {"label": "Topic {}".format(i), "value": "{}".format(i)} for i in range(10)
+                                        {"label": "Topic {}".format(i+1), "value": "{}".format(i)} for i in range(12) #TODO
                                     ],
                                     placeholder="Select a topic"
                                 )
