@@ -116,7 +116,7 @@ app.layout = html.Div(
                                 dcc.Dropdown(
                                     id="topic_dropdown",
                                     options = [
-                                        {"label": "Topic {}".format(i), "value": "{}".format(i)} for i in range(12)
+                                        {"label": "Topic {}".format(i), "value": "{}".format(i)} for i in range(10)
                                     ],
                                     placeholder="Select a topic"
                                 )
@@ -142,12 +142,13 @@ app.layout = html.Div(
                         html.Div(
                             children = [dcc.Graph(id="map-graph")]
                         ),
-                        html.P(
-                            """LDA Topic Modeling Visualization:"""
-                        ),
+                        
                         html.Div(
                             children = [
-                                html.Iframe(src=app.get_asset_url("lda.html"), style=dict(width="100%", height="400%"))
+                                html.H3(
+                                    """LDA Topic Modeling Visualization:"""
+                                ),
+                                html.Iframe(src=app.get_asset_url("lda.html"), style=dict(width="95%", height="400%"))
                             ]
                         )
                     ],
@@ -158,7 +159,9 @@ app.layout = html.Div(
 )
 
 import plotly.express as px
-df = pd.read_csv("./data/aggregated_data.csv")
+import json
+df = pd.read_csv("./data/aggregated_data.csv", dtype={"ISO": str})
+countries = json.load(open("./data/countries.geo.json"))
 
 @app.callback(
     Output("continent-dropdown-div", "children"),
@@ -193,26 +196,30 @@ def show_continent_dropbox(map_view):
     Input("continent-dropdown", "value"), suppress_callback_exceptions=True
 )
 def display_map(topic, map_view, continent):
+    
     if map_view == "continent" and continent is not None:
         scope = continent
     else:
         scope = "world"
 
     if topic is None:
-        choropleth_map = px.choropleth(df, locations="ISO", scope=scope)
+        choropleth_map = px.choropleth(df, geojson=countries, locations = "ISO", featureidkey = "id", scope=scope)
     else:
         choropleth_map = px.choropleth(
             df, 
+            geojson=countries,
             color =  df[topic],
             locations = "ISO",
-            range_color = [0, max(df[topic])],
+            featureidkey = "id",
+            range_color = [0, 1],
+            color_continuous_scale="bugn",
             scope=scope
         )
     choropleth_map.update_layout(
         title_text = "NDCs Topic Intensity", #TODO
         geo = dict(
             showframe=False,
-            showcoastlines=False,
+            showcoastlines=True,
             projection_type = 'equirectangular'
         ),
         margin={"r":0, "l":0, "b":0}
