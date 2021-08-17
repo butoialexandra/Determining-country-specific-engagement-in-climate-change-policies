@@ -9,7 +9,15 @@ body {
   margin: 0;
   padding: 0;
 }
-h1, h2, h3, h4, h5 {
+h1, h2 {
+  font-family: "Open Sans";
+  font-weight: bold;
+  letter-spacing: 2.1px;
+  font-size: 30px;
+  padding-left: 12px;
+}
+
+ h3, h4, h5 {
   font-family: "Open Sans";
   font-weight: bold;
   letter-spacing: 2.1px;
@@ -19,14 +27,26 @@ h1, h2, h3, h4, h5 {
 p {
   font-family: "Open Sans";
   font-weight: 400;
-  font-size: 14px;
+  font-size: 16px;
   padding-left: 12px;
 }
 a {
   text-decoration: none;
 }
+iframe {
+  border: 1px ;
+  width: 100%;
+  height: 100vh;
+  background-color:#dbdbdb;
+}
+
+img{
+  max-width: fit-content;
+  width: "100%";
+  height: auto;
+}
 .bg-grey{
-  background-color: #ffffff;
+  background-color: #dbdbdb;
 }
 .text-padding{
   padding: 5px;
@@ -61,13 +81,14 @@ a {
   text-align: center;
 }
 .logo {
-  height: 35px;
+  width: 200px;
+  height: auto;
   padding-bottom: 12px;
   margin-left: 8px;
 }
 .Select-control, .Select-menu-outer, .Select-multi-value-wrapper, .select-up, .is-open .Select-control {
   background-color: #1E1E1E;
-  color: white;
+  color: #dbdbdb;
   
 }
 
@@ -207,3 +228,5 @@ a {
 .CalendarMonth_table td {
   padding: unset;  
 }
+
+/* Iframe */
