@@ -26,14 +26,14 @@ if(typeof(LDAvis) !== "undefined"){
    require.config({paths: {d3: "https://d3js.org/d3.v5"}});
    require(["d3"], function(d3){
       window.d3 = d3;
-      LDAvis_load_lib("https://cdn.jsdelivr.net/gh/bmabey/pyLDAvis/pyLDAvis/js/ldavis.v3.0.0.js", function(){
+      LDAvis_load_lib("./ldavis.v3.0.0.js", function(){
         new LDAvis("#" + "ldavis_el4611400878111598882094213773", ldavis_el4611400878111598882094213773_data);
       });
     });
 }else{
     // require.js not available: dynamically load d3 & LDAvis
     LDAvis_load_lib("https://d3js.org/d3.v5.js", function(){
-         LDAvis_load_lib("https://cdn.jsdelivr.net/gh/bmabey/pyLDAvis/pyLDAvis/js/ldavis.v3.0.0.js", function(){
+         LDAvis_load_lib("./ldavis.v3.0.0.js", function(){
                  new LDAvis("#" + "ldavis_el4611400878111598882094213773", ldavis_el4611400878111598882094213773_data);
             })
          });
