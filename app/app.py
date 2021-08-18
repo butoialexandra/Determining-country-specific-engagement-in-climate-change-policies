@@ -8,6 +8,9 @@ from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
 from plotly.graph_objs import *
 from datetime import datetime as dt
+from flask_caching import Cache
+import plotly.express as px
+import json
 
 topic_names = ["Natural Disaster", "Economy", "General Terms", "Policy & Strategy",
                "Natural Resources", "Paris Agreement", "Carbon Emission", "Government",
@@ -20,6 +23,17 @@ app = dash.Dash(
 app.title = "bdpp"
 server = app.server
 
+cache = Cache(app.server, config={
+    'CACHE_TYPE': 'filesystem',
+    'CACHE_DIR': 'cache-directory'
+})
+
+TIMEOUT = 600
+
+df = pd.read_csv("./data/aggregated_data.csv", dtype={"ISO": str})
+@cache.memoize(timeout=TIMEOUT)
+def load_countries():
+    return json.load(open("./data/countries.geojson"))
 
 # Layout of Dash App
 app.layout = html.Div(
@@ -127,10 +141,6 @@ app.layout = html.Div(
     ]
 )
 
-import plotly.express as px
-import json
-df = pd.read_csv("./data/aggregated_data.csv", dtype={"ISO": str})
-countries = json.load(open("./data/countries.geojson"))
 
 @app.callback(
     Output("continent-dropdown-div", "children"),
@@ -156,16 +166,16 @@ def show_continent_dropbox(map_view):
         return container
     else:
         return dcc.Dropdown(id = "continent-dropdown", disabled=True)
-    
 
-@app.callback(
+
+@app.callback( 
     Output("map-graph", "figure"),
     Input("topic_dropdown", "value"),
     Input("view-radioitems", "value"),
     Input("continent-dropdown", "value"), suppress_callback_exceptions=True
 )
 def display_map(topic, map_view, continent):
-    
+    countries = load_countries()
     if map_view == "continent" and continent is not None:
         scope = continent
     else:
@@ -194,7 +204,8 @@ def display_map(topic, map_view, continent):
     else:
         title_text = "Intensity of Topic {}: {}".format(topic+1, topic_names[topic])
     choropleth_map.update_layout(
-        title_text = title_text, #TODO
+        title_text = title_text, 
+        coloraxis_colorbar=dict(title="Topic Intensity")
         geo = dict(
             showframe=False,
             showcoastlines=False,
@@ -206,5 +217,6 @@ def display_map(topic, map_view, continent):
         paper_bgcolor = "#dbdbdb"
     )
     return choropleth_map
+
 if __name__ == "__main__":
     app.run_server(debug=False)

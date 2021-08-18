@@ -1,5 +1,9 @@
 PyMuPDF
 tqdm
 pandas
+numpy
 gensim
 nltk
+dash
+plotly
+Flask-Caching
