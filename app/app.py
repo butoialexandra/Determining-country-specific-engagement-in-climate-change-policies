@@ -9,6 +9,10 @@ import plotly.graph_objs as go
 from plotly.graph_objs import *
 from datetime import datetime as dt
 
+topic_names = ["Natural Disaster", "Economy", "General Terms", "Policy & Strategy",
+               "Natural Resources", "Paris Agreement", "Carbon Emission", "Government",
+               "Finance", "Energy", "Implementation & Action", "Methodology"
+]
 
 app = dash.Dash(
     __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}],
@@ -73,7 +77,7 @@ app.layout = html.Div(
                                 dcc.Dropdown(
                                     id="topic_dropdown",
                                     options = [
-                                        {"label": "Topic {}".format(i+1), "value": "{}".format(i)} for i in range(12) #TODO
+                                        {"label": "Topic {}: {}".format(i+1, topic_names[i]), "value": i} for i in range(12) #TODO
                                     ],
                                     placeholder="Select a topic"
                                 )
@@ -87,7 +91,7 @@ app.layout = html.Div(
                             
                             Design Credits to: [Dash-sample-apps](https://github.com/plotly/dash-sample-apps/tree/main/apps/dash-uber-rides-demo) 
                             
-                            Disclaimer: The map features are by definition subject to change, debate and dispute. We use geojsons from [this repository](https://github.com/johan/world.geo.json)
+                            Disclaimer: The map features are by definition subject to change, debate and dispute. We use geojsons from [this repository](https://datahub.io/core/geo-countries#resource-countries)
                             with some modifications. 
                             """,
                             style = {"margin-top": "30px"}
@@ -99,7 +103,12 @@ app.layout = html.Div(
                     className="eight columns div-for-charts bg-grey",
                     children=[
                         html.Div(
-                            children = [dcc.Graph(id="map-graph")]
+                            children = [
+                                html.H3("""Aggregated Topic Intensity of NDCs""", style = {"color":"#1E1E1E"}),
+                                html.P("""Each NDC contains multiple paragraphs and each paragraph is modeled as a distribution of topics. 
+                                The topic intensity is the average topic distribution.""", style = {"color":"#1E1E1E"}),
+                                dcc.Graph(id="map-graph")
+                                ]
                         ),
                         
                         html.Div(
@@ -121,7 +130,7 @@ app.layout = html.Div(
 import plotly.express as px
 import json
 df = pd.read_csv("./data/aggregated_data.csv", dtype={"ISO": str})
-countries = json.load(open("./data/countries.geo.json"))
+countries = json.load(open("./data/countries.geojson"))
 
 @app.callback(
     Output("continent-dropdown-div", "children"),
@@ -166,22 +175,26 @@ def display_map(topic, map_view, continent):
         choropleth_map = px.choropleth(df, 
             locations = "ISO", 
             geojson=countries, 
-            featureidkey = "id", 
+            featureidkey = "properties.ISO_A3", 
             color_discrete_sequence = ["lightgrey"],
             scope=scope)
     else:
         choropleth_map = px.choropleth(
             df, 
             geojson=countries,
-            color =  df[topic],
+            color =  df[str(topic)],
             locations = "ISO",
-            featureidkey = "id",
-            range_color = [0, max(df[topic])],
+            featureidkey = "properties.ISO_A3",
+            range_color = [0, max(df[str(topic)])],
             color_continuous_scale="bugn",
             scope=scope
         )
+    if topic is None:
+        title_text = "Submitted Partiese of NDCs"
+    else:
+        title_text = "Intensity of Topic {}: {}".format(topic+1, topic_names[topic])
     choropleth_map.update_layout(
-        title_text = "NDCs Topic Intensity", #TODO
+        title_text = title_text, #TODO
         geo = dict(
             showframe=False,
             showcoastlines=False,
@@ -194,4 +207,4 @@ def display_map(topic, map_view, continent):
     )
     return choropleth_map
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=False)
