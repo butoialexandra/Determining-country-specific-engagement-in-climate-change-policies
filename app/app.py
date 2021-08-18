@@ -205,7 +205,7 @@ def display_map(topic, map_view, continent):
         title_text = "Intensity of Topic {}: {}".format(topic+1, topic_names[topic])
     choropleth_map.update_layout(
         title_text = title_text, 
-        coloraxis_colorbar=dict(title="Topic Intensity")
+        coloraxis_colorbar=dict(title="Topic Intensity"),
         geo = dict(
             showframe=False,
             showcoastlines=False,
